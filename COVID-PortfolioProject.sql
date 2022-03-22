@@ -1,5 +1,8 @@
+--Dados de COVID-19
+--Fonte: https://ourworldindata.org/covid-deaths
 
---Selecionando dados que serão utilizados
+
+--Selecionando dados que serÃ£o utilizados
 
 SELECT Location, date, total_cases, new_cases, total_deaths, population
 FROM PortfolioProject..CovidDeaths
@@ -29,21 +32,21 @@ FROM PortfolioProject..CovidDeaths
 WHERE location like '%brazil%' AND continent is not null
 ORDER BY 1,2 
 
--- Total de casos x população
--- Mostra qual porcentagem da população contraiu COVID-19
+-- Total de casos x populaÃ§Ã£o
+-- Mostra qual porcentagem da populaÃ§Ã£o contraiu COVID-19
 SELECT Location, date, Population, total_cases,  (total_deaths/Population)*100 as PercentagePopulationInfected
 FROM PortfolioProject..CovidDeaths
 WHERE location like '%brazil%' AND continent is not null
 ORDER BY 1,2 
 
---Países com maior taxa de infecções comparado a população
+--PaÃ­ses com maior taxa de infecÃ§Ãµes comparado a populaÃ§Ã£o
 SELECT Location, Population, MAX(total_cases) as HighestInfectionCount,  Max((total_deaths/Population))*100 as PercentagePopulationInfected
 FROM PortfolioProject..CovidDeaths
 WHERE continent is not null
 GROUP BY Location, Population
 ORDER BY PercentagePopulationInfected desc
 
---Países com maior contagem de mortes por população
+--PaÃ­ses com maior contagem de mortes por populaÃ§Ã£o
 Select Location, MAX(cast(Total_deaths as int)) as TotalDeathCount
 FROM PortfolioProject..CovidDeaths
 WHERE continent is not null
@@ -58,14 +61,14 @@ GROUP BY continent
 ORDER BY TotalDeathCount desc
 
 
---Números globais
+--NÃºmeros globais
 SELECT  SUM(cast(new_cases as float)), SUM(cast(new_deaths as float)), SUM(cast(new_deaths as float))/SUM(new_cases)*100 as DeathPercentage
 FROM PortfolioProject..CovidDeaths
 WHERE continent is not null
 
 ORDER BY 1,2 
 
---Total População x Vacina
+--Total PopulaÃ§Ã£o x Vacina
 With PopvsVac (continent, Location, Date, Population, New_Vaccinations, RollingPeopleVaccinated)
 as (
 SELECT dea.continent, dea.location, dea.date, dea.population, vac.new_vaccinations,SUM(cast(vac.new_vaccinations as float)) OVER (Partition by dea.Location Order by dea.location,
@@ -79,7 +82,7 @@ WHERE dea.continent is not null
 SELECT * , (RollingPeopleVaccinated/Population)* 100
 FROM PopvsVac
 
----Tabela temporária
+---Tabela temporÃ¡ria
 DROP Table if exists #PercentPopulationVaccinated
 CREATE TABLE #PercentPopulationVaccinated
 (
@@ -104,7 +107,7 @@ WHERE dea.continent is not null
 SELECT * , (RollingPeopleVaccinated/Population)* 100
 FROM #PercentPopulationVaccinated
 
--- Criando visualização
+-- Criando visualizaÃ§Ã£o
 CREATE VIEW PercentPopulationVaccinated2 as
 SELECT dea.continent, dea.location, dea.date, dea.population, vac.new_vaccinations,SUM(cast(vac.new_vaccinations as float)) OVER (Partition by dea.Location Order by dea.location,
 	dea.Date) as RollingPeopleVaccinant
